@@ -33,8 +33,8 @@ func (c *Controller) Serve() {
 	} else {
 		c.Res.Message = "Success"
 		c.Res.Status = 200
-		c.Data["json"] = c.Res
 	}
 
+	c.Data["json"] = c.Res
 	c.ServeJSON()
 }
