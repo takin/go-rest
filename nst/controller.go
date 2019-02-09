@@ -1,4 +1,4 @@
-// Package controllers Main Controller untuk memudahkan proses
+// Package nst Main Controller untuk memudahkan proses
 // Pembuatan response pada API Controller yang
 // mengimplementasikan Beego Framework
 // Created By: Syamsul Muttaqin @2019
@@ -19,28 +19,22 @@ type Response struct {
 type Controller struct {
 	beego.Controller
 	Res Response
-}
-
-// ServeSuccess method untuk mengembalikan response sukses
-func (c *Controller) ServeSuccess() {
-	c.Res.Message = "Success"
-	c.Res.Status = 200
-	c.Serve()
-}
-
-// ServeError Response formatter untuk error response
-func (c *Controller) ServeError() {
-	if c.Res.Status == 0 {
-		c.Res.Status = 403
-	}
-	if c.Res.Message == "" {
-		c.Res.Message = "Unknown Error Occurs"
-	}
-	c.Serve()
+	Err error
 }
 
 // Serve main method for response
 func (c *Controller) Serve() {
-	c.Data["json"] = c.Res
+
+	if c.Err != nil {
+		if c.Res.Status == 0 {
+			c.Res.Status = 403
+		}
+		c.Res.Message = c.Err.Error()
+	} else {
+		c.Res.Message = "Success"
+		c.Res.Status = 200
+		c.Data["json"] = c.Res
+	}
+
 	c.ServeJSON()
 }
