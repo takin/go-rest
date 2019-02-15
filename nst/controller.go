@@ -5,6 +5,8 @@
 package nst
 
 import (
+	"regexp"
+
 	"github.com/astaxie/beego"
 )
 
@@ -29,7 +31,11 @@ func (c *Controller) Serve() {
 		if c.Res.Status == 0 {
 			c.Res.Status = 403
 		}
-		c.Res.Message = c.Err.Error()
+		// Beberapa error message masih mengembalikan raw format
+		// seperti beberapa error message dari ORM Beego masih menggunakan
+		// format <QuerySetter> ... sehingga ini harus dibuang
+		re := regexp.MustCompile("^[<(a-zA-Z0-9)>]+\\s*")
+		c.Res.Message = re.ReplaceAllString(c.Err.Error(), "")
 	} else {
 		c.Res.Message = "Success"
 		c.Res.Status = 200
