@@ -5,15 +5,20 @@
 package nst
 
 import (
+	"regexp"
+
 	"github.com/astaxie/beego"
 )
 
 // Response standar response model
 type Response struct {
-	Status  int         `json:"status"`
-	Message string      `json:"message"`
-	Payload interface{} `json:"payload"`
-	Errors  interface{} `json:"errors,omitempty"`
+	StatusCode    int         `json:"status_code"`
+	StatusMessage string      `json:"status_message"`
+	Description   string      `json:"description"`
+	Count         int         `json:"count,omitempty"`
+	Page          int         `json:"page,omitempty"`
+	Href          string      `json:"href"`
+	Payload       interface{} `json:"payload"`
 }
 
 // Controller main controller structre
@@ -26,26 +31,33 @@ type Controller struct {
 // Serve main method for response
 func (c *Controller) Serve() {
 
+	c.Res.Href = c.Ctx.Input.URI()
+
 	if c.Err != nil {
-		if c.Res.Status == 0 {
-			c.Res.Status = 403
+		if c.Res.StatusCode == 0 {
+			c.Res.StatusCode = 403
 		}
 
+		// Set status message menjadi error ketika c.Err bukan sama dengan nil
+		// agar frontend lebih mudah consume dan identifikasi error
+		// karena hanya ada 2 pesan => ["Success","Error"]
+		// dan pesan error saya masukkan ke description dibawah
+		c.Res.StatusMessage = "Error"
+
 		// Set Http response code agar header status code sama dengan body
-		c.Ctx.Output.SetStatus(c.Res.Status)
+		c.Ctx.Output.SetStatus(c.Res.StatusCode)
 
 		// Beberapa error message masih mengembalikan raw format
 		// seperti beberapa error message dari ORM Beego masih menggunakan
 		// format <QuerySetter> ... sehingga ini harus dibuang
+		re := regexp.MustCompile("<[a-zA-Z0-9]+>\\s*")
 
-		// Saya komen dulu karena message jadi berubah ketika kalimat lebih dari 1
+		// Saya menggunakan description untuk menampilkan pesan error
+		c.Res.Description = re.ReplaceAllString(c.Err.Error(), "")
 
-		// re := regexp.MustCompile("^[<(a-zA-Z0-9)>]+\\s*")
-		// c.Res.Message = re.ReplaceAllString(c.Err.Error(), "")
-		c.Res.Message = c.Err.Error()
 	} else {
-		c.Res.Message = "Success"
-		c.Res.Status = 200
+		c.Res.StatusMessage = "Success"
+		c.Res.StatusCode = 200
 	}
 
 	c.Data["json"] = c.Res
