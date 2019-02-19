@@ -16,7 +16,7 @@ type Response struct {
 	StatusMessage string      `json:"status_message"`
 	Description   string      `json:"description"`
 	Count         int         `json:"count,omitempty"`
-	Page          int         `json:"page,omitempty"`
+	Offset        int         `json:"offset,omitempty"`
 	Href          string      `json:"href"`
 	Payload       interface{} `json:"payload"`
 }
