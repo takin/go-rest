@@ -1,4 +1,4 @@
-package nst
+package akin
 
 import (
 	"github.com/astaxie/beego"

@@ -2,7 +2,7 @@
 // Pembuatan response pada API Controller yang
 // mengimplementasikan Beego Framework
 // Created By: Syamsul Muttaqin @2019
-package nst
+package akin
 
 import (
 	"regexp"
