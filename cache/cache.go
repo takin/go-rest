@@ -35,11 +35,13 @@ func (c *Channel) Close() {
 }
 
 func (c *FileCache) Read() (content interface{}, err error) {
-	cache, err := os.Open(c.Path)
-	defer cache.Close()
+	var cacheFile *os.File
+	var cacheContent []byte
+	cacheFile, err = os.Open(c.Path)
+	defer cacheFile.Close()
 	if err == nil {
-		if byteContent, err := ioutil.ReadAll(cache); err == nil {
-			err = jsoniter.Unmarshal([]byte(byteContent), &content)
+		if cacheContent, err = ioutil.ReadAll(cacheFile); err == nil {
+			err = jsoniter.Unmarshal([]byte(cacheContent), &content)
 		}
 	}
 	return
